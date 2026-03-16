@@ -1,6 +1,6 @@
-# bpmapi
+# rest-api
 
-BPM API — .NET 8 Web API with OAuth 2.0 Client Credentials Flow (pure .NET implementation, no IdentityServer required).
+REST API — .NET 8 Web API with OAuth 2.0 Client Credentials Flow (pure .NET implementation, no IdentityServer required).
 
 ## Features
 
@@ -13,7 +13,7 @@ BPM API — .NET 8 Web API with OAuth 2.0 Client Credentials Flow (pure .NET imp
 ## Project Structure
 
 ```
-BpmApi/
+RestApi/
 ├── Controllers/
 │   ├── OAuthController.cs       # Token issuance endpoint (POST /connect/token)
 │   └── WeatherController.cs     # Protected API example

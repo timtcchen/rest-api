@@ -1,10 +1,10 @@
-using BpmApi.Models;
-using BpmApi.Services;
+using RestApi.Models;
+using RestApi.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace BpmApi.Controllers;
+namespace RestApi.Controllers;
 
 /// <summary>
 /// OAuth 2.0 授權端點控制器。

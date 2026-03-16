@@ -1,10 +1,10 @@
-using BpmApi.Models;
+using RestApi.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace BpmApi.Services;
+namespace RestApi.Services;
 
 /// <summary>
 /// JWT Token 產生服務，負責依 Client Credentials 產生符合 OAuth 2.0 規範的 JWT。

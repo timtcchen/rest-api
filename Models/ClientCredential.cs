@@ -1,4 +1,4 @@
-namespace BpmApi.Models;
+namespace RestApi.Models;
 
 /// <summary>
 /// OAuth 2.0 用戶端憑證設定模型，對應 appsettings.json 中的 OAuthClients 陣列。
