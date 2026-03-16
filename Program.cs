@@ -1,4 +1,4 @@
-using BpmApi.Services;
+using RestApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -16,9 +16,9 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "BpmApi",
+        Title = "RestApi",
         Version = "v1",
-        Description = "BPM API - OAuth 2.0 Client Credentials Flow 範例（純 .NET 實作，不依賴 IdentityServer）"
+        Description = "REST API - OAuth 2.0 Client Credentials Flow 範例（純 .NET 實作，不依賴 IdentityServer）"
     });
 
     // 定義 Bearer Token 安全方案
@@ -91,7 +91,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "BpmApi v1");
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "RestApi v1");
         options.RoutePrefix = string.Empty; // 將 Swagger UI 設為根路徑
     });
 }
