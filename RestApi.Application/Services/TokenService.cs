@@ -1,17 +1,20 @@
-using RestApi.Models;
+using RestApi.Application.DTOs;
+using RestApi.Application.Interfaces;
+using RestApi.Domain.Entities;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace RestApi.Services;
+namespace RestApi.Application.Services;
 
 /// <summary>
 /// JWT Token 產生服務，負責依 Client Credentials 產生符合 OAuth 2.0 規範的 JWT。
 ///
 /// 不依賴任何第三方 IdentityServer，僅使用原生 .NET 與 Microsoft.IdentityModel 套件。
 /// </summary>
-public class TokenService
+public class TokenService : ITokenService
 {
     private readonly IConfiguration _config;
 
@@ -20,12 +23,7 @@ public class TokenService
         _config = config;
     }
 
-    /// <summary>
-    /// 依據已驗證的 ClientCredential 與請求的 scope 產生 JWT Access Token。
-    /// </summary>
-    /// <param name="client">已驗證的用戶端憑證資訊。</param>
-    /// <param name="requestedScope">用戶端請求的 scope（空白分隔），null 表示請求所有允許的 scope。</param>
-    /// <returns>包含 access_token、token_type、expires_in、scope 的回應物件。</returns>
+    /// <inheritdoc/>
     public TokenResponse GenerateToken(ClientCredential client, string? requestedScope)
     {
         var jwtSettings = _config.GetSection("Jwt");

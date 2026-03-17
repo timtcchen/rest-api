@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace RestApi.Models;
+namespace RestApi.Api.Models;
 
 /// <summary>
 /// OAuth 2.0 Client Credentials 授權請求模型。

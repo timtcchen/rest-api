@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace RestApi.Models;
+namespace RestApi.Application.DTOs;
 
 /// <summary>
 /// OAuth 2.0 Token 回應模型，符合 RFC 6749 Section 5.1 規範。

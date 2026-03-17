@@ -1,10 +1,12 @@
-using RestApi.Models;
-using RestApi.Services;
+using RestApi.Api.Models;
+using RestApi.Application.DTOs;
+using RestApi.Application.Interfaces;
+using RestApi.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace RestApi.Controllers;
+namespace RestApi.Api.Controllers;
 
 /// <summary>
 /// OAuth 2.0 授權端點控制器。
@@ -21,9 +23,9 @@ namespace RestApi.Controllers;
 public class OAuthController : ControllerBase
 {
     private readonly IConfiguration _config;
-    private readonly TokenService _tokenService;
+    private readonly ITokenService _tokenService;
 
-    public OAuthController(IConfiguration config, TokenService tokenService)
+    public OAuthController(IConfiguration config, ITokenService tokenService)
     {
         _config = config;
         _tokenService = tokenService;

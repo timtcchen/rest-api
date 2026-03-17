@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace RestApi.Controllers;
+namespace RestApi.Api.Controllers;
 
 /// <summary>
 /// 受 JWT 保護的 Weather API 範例控制器，示範如何搭配 OAuth 2.0 Client Credentials Flow 保護 API 端點。
