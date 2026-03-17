@@ -1,7 +1,6 @@
 using RestApi.Api.Models;
 using RestApi.Application.DTOs;
 using RestApi.Application.Interfaces;
-using RestApi.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
 using System.Text;
@@ -22,13 +21,18 @@ namespace RestApi.Api.Controllers;
 [Tags("OAuth 2.0")]
 public class OAuthController : ControllerBase
 {
-    private readonly IConfiguration _config;
+    private readonly IClientRepository _clientRepository;
     private readonly ITokenService _tokenService;
+    private readonly ILogger<OAuthController> _logger;
 
-    public OAuthController(IConfiguration config, ITokenService tokenService)
+    public OAuthController(
+        IClientRepository clientRepository,
+        ITokenService tokenService,
+        ILogger<OAuthController> logger)
     {
-        _config = config;
+        _clientRepository = clientRepository;
         _tokenService = tokenService;
+        _logger = logger;
     }
 
     /// <summary>
@@ -48,27 +52,29 @@ public class OAuthController : ControllerBase
     /// - 400 invalid_scope：請求的 scope 超出允許範圍
     /// </remarks>
     /// <param name="request">Token 請求參數。</param>
+    /// <param name="cancellationToken">取消令牌。</param>
     /// <returns>包含 access_token 的 TokenResponse。</returns>
     [HttpPost("token")]
     [Consumes("application/x-www-form-urlencoded")]
     [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public IActionResult Token([FromForm] TokenRequest request)
+    public async Task<IActionResult> TokenAsync(
+        [FromForm] TokenRequest request,
+        CancellationToken cancellationToken)
     {
         // Step 1：驗證 grant_type，僅支援 client_credentials
         if (request.GrantType != "client_credentials")
             return BadRequest(new { error = "unsupported_grant_type" });
 
-        // Step 2：從設定檔取得所有已知 Clients，驗證 client_id / client_secret
-        // ⚠️ 生產環境建議：從資料庫查詢並使用 bcrypt 比對 hashed secret
-        var clients = _config.GetSection("OAuthClients")
-                             .Get<List<ClientCredential>>() ?? new List<ClientCredential>();
-
-        // 先依 client_id 找到 client，再使用常數時間比較避免 timing attack
-        var client = clients.FirstOrDefault(c => c.ClientId == request.ClientId);
+        // Step 2：從資料庫查詢 client，驗證 client_id / client_secret
+        // ⚠️ 生產環境建議：ClientSecret 應使用 bcrypt 雜湊儲存，驗證時比對雜湊值
+        var client = await _clientRepository.FindByClientIdAsync(request.ClientId, cancellationToken);
         if (client is null || !SecretEquals(client.ClientSecret, request.ClientSecret))
+        {
+            _logger.LogWarning("認證失敗：client_id={ClientId}", request.ClientId);
             return Unauthorized(new { error = "invalid_client" });
+        }
 
         // Step 3：驗證 scope，確認請求的 scope 均在 client 允許範圍內
         if (!string.IsNullOrWhiteSpace(request.Scope))
@@ -76,11 +82,16 @@ public class OAuthController : ControllerBase
             var requestedScopes = request.Scope.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             var invalidScopes = requestedScopes.Except(client.Scopes).ToList();
             if (invalidScopes.Count > 0)
+            {
+                _logger.LogWarning("無效的 scope 請求：client_id={ClientId}, InvalidScopes={InvalidScopes}",
+                    request.ClientId, string.Join(" ", invalidScopes));
                 return BadRequest(new { error = "invalid_scope" });
+            }
         }
 
         // Step 4：產生並回傳 JWT Token
         var tokenResponse = _tokenService.GenerateToken(client, request.Scope);
+        _logger.LogInformation("Token 核發成功：client_id={ClientId}", request.ClientId);
         return Ok(tokenResponse);
     }
 
